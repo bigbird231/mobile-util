@@ -352,5 +352,5 @@
         }
     };
 
-    window.Util=window.@=Util;
+    window.Util=Util;
 })();
