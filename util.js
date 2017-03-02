@@ -1,7 +1,7 @@
 /**
  * Created by yuhk18757 on 2017/2/18.
  */
-(function(){
+(function(global){
     //区分代码所处环境--dev|sit|uat|prd
     var environment="dev",config;
     /*
@@ -19,6 +19,7 @@
      *
      * - osType:获取移动端浏览器运行的系统环境信息
      */
+    var _Util=global.Util;
     var Util;
 
     //配置移动端web页面
@@ -41,7 +42,10 @@
         })();
     })(document, window);
 
-    //Util本身为一个dom选择器
+    /*
+     * Util本身为一个dom选择器
+     * @param {string} selector
+     */
     Util=function(selector){
         var elements=document.querySelectorAll(selector);
         if(selector.indexOf("#")==0){
@@ -89,7 +93,7 @@
         };
 
         //接收dom元素/回调函数为参数，当元素展现在屏幕上时触发回调方法
-        screenHeight=window.screen.availHeight;
+        screenHeight=global.screen.availHeight;
         scrollFn=[];
         bindShow=function(element,callback){
             var distance,scrollTop;
@@ -106,7 +110,7 @@
         init=function(){
             var timer,delay;
             delay=200;
-            window.addEventListener("scroll",function(e){
+            global.addEventListener("scroll",function(e){
                 clearTimeout(timer);
                 timer=setTimeout(function(){
                     for(var i in scrollFn){
@@ -119,6 +123,7 @@
 
         /*
          * 包装dom元素，使其具有on事件，可以用来绑定自定义事件
+         * @param {object} element
          *
          * - on:接收事件类型字符串/回调函数为参数，为对应的dom元素提供自定义事件支持。事件类型支持"tap"。
          */
@@ -145,6 +150,7 @@
 
     /*
      * ready:兼容性监听页面就绪，早于window.onload
+     * @param {function} callback
      */
     Util.ready=function(callback){
         //标记页面是否已就绪
@@ -155,7 +161,7 @@
                 alreadyrunflag=1;
                 callback();
             },false);
-        }else if (document.all && !window.opera){
+        }else if (document.all && !global.opera){
             document.write('<script type="text/javascript" id="contentloadtag" defer="defer" src="javascript:void(0)"><\/script>');
             var contentloadtag=document.getElementById("contentloadtag");
             contentloadtag.onreadystatechange=function(){
@@ -166,7 +172,7 @@
             }
         }
 
-        window.onload=function(){
+        global.onload=function(){
             setTimeout(function(){
                 if(!alreadyrunflag){
                     callback();
@@ -192,7 +198,7 @@
      *   }
      */
     Util.ajax=(function(){
-        var createXHR,addURLParam,ajax,setup,ggptServer,yfzxServer;
+        var createXHR,addURLParam,ajax,setup;
 
         //创建一个兼容各浏览器的XMLHttpRequest对象
         createXHR=function(){
@@ -215,13 +221,21 @@
             }
         };
 
-        //如果是get请求，将查询数据设置成url查询字符串
+        /*
+         * 如果是get请求，将查询数据设置成url查询字符串
+         * @param {string} url
+         * @param {string} name
+         * @param {string} value
+         */
         addURLParam=function(url,name,value){
             url+=(url.indexOf("?")==-1 ? "?":"&");
             url+=encodeURIComponent(name)+"="+encodeURIComponent(value);
             return url;
         };
 
+        /*
+         * @param {object} options
+         */
         ajax=function(options){
             if(options.type==undefined){
                 options.type="get";
@@ -293,17 +307,10 @@
             }
         };
 
-        //公共平台后台
-        ggptServer=function(options){
-            //配置资金账号、币种类别
-            options.url=config.url+options.url;
-            //配置url随机数
-            options.url+=".json?random="+Math.random();
-
-            ajax(options);
-        };
-
-        //柯里化调用ajax，提前设置查询接口必须的参数配置，若是调用openapi则不配置
+        /*
+         * 柯里化调用ajax，提前设置查询接口必须的参数配置，若是调用openapi则不配置
+         * @param {object} options
+         */
         setup=function(options){
             ajax(options);
         };
@@ -313,10 +320,11 @@
 
     /*
      * - getUrlParam:根据传入的name参数获取url上携带的查询参数
+     * @param {string} name
      */
     Util.getUrlParam=function(name){
         var reg=new RegExp("(\\?|&)"+name+"=([^&#]*)([&#]|$)");
-        var r=window.location.href.match(reg);
+        var r=document.location.href.match(reg);
         if (r!= null && r!='undefined'){
             return decodeURIComponent(r[2]);
         }
@@ -341,7 +349,10 @@
         return osType;
     };
 
-    //带所有参数跳转，接受跳转后的页面url为参数
+    /*
+     * 带所有参数跳转，接受跳转后的页面url为参数
+     * @param {string} url
+     */
     Util.redirectWithUrlParam=function(url){
         var params;
         params=document.location.href.split("?")[1];
@@ -352,5 +363,11 @@
         }
     };
 
-    window.Util=Util;
-})();
+    //释放对window.Util的控制，返回一个Util实例，以转移引用
+    Util.noConflict=function(){
+        global.Util=_Util;
+        return Util;
+    };
+
+    global.Util=Util;
+})(this);
