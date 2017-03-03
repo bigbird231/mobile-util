@@ -1,4 +1,6 @@
 #mobile-util
+A precise JavaScript library for mobile-web development,with a jQuery-compatile API.
+
 一个精致的移动端前端开发帮助库。提供非常精简的移动端兼容性方案实现：
 - 类jQuery选择器Util(".class")
 - 为dom元素提供tap（已处理点透）、show事件（已节流处理）
