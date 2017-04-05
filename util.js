@@ -71,25 +71,31 @@
         //接收dom元素/回调函数为参数，将回调函数绑定为dom元素的tap事件，防止点透
         bindTap=function(element,callback){
             //element.addEventListener("click",callback);
-            var startX,startY;
+            var startX,startY,tooLong;
 
             //isSubmit标记位来防止tap事件点透
             element.isSubmit=false;
             element.addEventListener("touchstart",function (e) {
+                tooLong=false;
                 startX=e.changedTouches[0].pageX;
                 startY=e.changedTouches[0].pageY;
+                setTimeout(function(){
+                    tooLong=true;
+                },300);
             }, false);
             element.addEventListener('touchend', function (e) {
-                var deltaX=e.changedTouches[0].pageX-startX;
-                var deltaY=e.changedTouches[0].pageY - startY;
-                if (Math.abs(deltaX)<10 && Math.abs(deltaY)<10) {
-                    e.preventDefault();
-                    if(!element.isSubmit){
-                        element.isSubmit=true;
-                        setTimeout(function(){
-                            element.isSubmit=false;
-                        },300);
-                        callback(e);
+                if(!tooLong){
+                    var deltaX=e.changedTouches[0].pageX-startX;
+                    var deltaY=e.changedTouches[0].pageY - startY;
+                    if (Math.abs(deltaX)<10 && Math.abs(deltaY)<10) {
+                        e.preventDefault();
+                        if(!element.isSubmit){
+                            element.isSubmit=true;
+                            setTimeout(function(){
+                                element.isSubmit=false;
+                            },300);
+                            callback(e);
+                        }
                     }
                 }
             }, false);
