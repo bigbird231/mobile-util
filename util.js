@@ -47,6 +47,9 @@
      * @param {string} selector
      */
     Util=function(selector){
+        if(typeof selector=="object"){
+            return Util.fn.factory(selector);
+        }
         var elements=document.querySelectorAll(selector);
         if(selector.indexOf("#")==0){
             return Util.fn.factory(elements[0]);
