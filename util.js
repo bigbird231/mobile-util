@@ -308,10 +308,17 @@
                     xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
                 }
                 var data="";
-                for(var i in options.data){
-                    data+=encodeURIComponent(i)+"="+encodeURIComponent(options.data[i])+"&";
+                //根据不同的content-type编码传输数据
+                if(options.contentType.indexOf("application/json")>=0){
+                    data=JSON.stringify(options.data);
+                }else if(options.contentType.indexOf("application/x-www-form-urlencoded")>=0){
+                    for(i in options.data){
+                        data+=encodeURIComponent(i)+"="+encodeURIComponent(options.data[i])+"&";
+                    }
+                    data=data.substring(0,data.length-1);
+                }else{
+                    console.log("不支持的content-type类型");
                 }
-                data=data.substring(0,data.length-1);
                 xhr.send(data);
             }
         };
