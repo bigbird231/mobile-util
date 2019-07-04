@@ -1,4 +1,4 @@
-# mobile-util
+# mobileutil
 A precise JavaScript library for mobile-web development,with a jQuery-compatile API.
 
 一个精致的移动端前端开发帮助库。提供非常精简的移动端兼容性方案实现：
